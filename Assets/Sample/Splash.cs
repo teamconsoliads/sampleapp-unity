@@ -17,6 +17,20 @@ public class Splash : MonoBehaviour
 	void Start ()
 	{
 		waitTimeField.text = WAIT_TIME + "";
+		/*
+		AdSize size = new AdSize (300,250);
+		AdPosition position = new AdPosition (100 , 200);
+
+		ConsoliAdsBannerView consoliAdsBannerView = new ConsoliAdsBannerView (size);
+		Debug.Log ("ID : "+consoliAdsBannerView.getBannerID ());
+		Debug.Log ("ID Width : "+consoliAdsBannerView.getAdSize().width);
+		Debug.Log ("ID Height : "+consoliAdsBannerView.getAdSize().height);
+
+		consoliAdsBannerView = new ConsoliAdsBannerView (position);
+		Debug.Log ("ID : "+consoliAdsBannerView.getBannerID ());
+		Debug.Log ("ID Width : "+consoliAdsBannerView.getAdPosition().x);
+		Debug.Log ("ID Height : "+consoliAdsBannerView.getAdPosition().y);
+		*/
 	}
 
 	public void InitializeButtonPressed()
@@ -28,7 +42,7 @@ public class Splash : MonoBehaviour
 		}
 
 		bool userConsent = UserConsentToggle.isOn;
-		ConsoliAds.Instance.initialize(userConsent);
+		ConsoliAds.Instance.initialize(userConsent , true , true);
 		initButton.enabled = false;// (false);
 		UserConsentToggle.enabled = false;
 		Invoke ("LevelLoad" , WAIT_TIME);

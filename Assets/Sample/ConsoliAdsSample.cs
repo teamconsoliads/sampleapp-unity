@@ -7,8 +7,7 @@ using System.Text;
 using System;
 
 public class ConsoliAdsSample : MonoBehaviour {
-
-	private bool isInitialized = true;
+    
 	private bool isNeedToUpdate = true;
 
 	[Header("Texts:")]
@@ -31,11 +30,19 @@ public class ConsoliAdsSample : MonoBehaviour {
 	public GameObject iconAdGameObject;
 	public GameObject nativeAdGameObject;
 
+	AdSize size = new AdSize (300,250);
+	AdPosition position = new AdPosition (100 , 200);
+	ConsoliAdsBannerView consoliAdsBannerView;
+	ConsoliAdsBannerView consoliAdsBannerViewSecond;
+
 	public InputField deviceID;
 
 	public 
 
 	void Start () {
+
+		consoliAdsBannerView = new ConsoliAdsBannerView ();
+		consoliAdsBannerViewSecond = new ConsoliAdsBannerView ();
 
 		adNetworkListText.text = "";
 
@@ -44,6 +51,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 		AdTypeList.Add ("Banner");
 		AdTypeList.Add ("Native");
 		AdTypeList.Add ("Icon");
+		AdTypeList.Add ("Second Banner");
 
 		AdTypeDropDown.options.Clear ();
 		SceneNameDropDown.options.Clear ();
@@ -65,13 +73,35 @@ public class ConsoliAdsSample : MonoBehaviour {
 
 	void SetupEvents()
 	{
+		ConsoliAds.onConsoliAdsInitializationSuccess += onConsoliAdsInitialization;
 		// Listen to all impression-related events
 		ConsoliAds.onInterstitialAdShownEvent += onInterstitialAdShown;
-		ConsoliAds.onVideoAdShownEvent += onVideoAdShown;
+		ConsoliAds.onInterstitialAdFailedToShowEvent += onInterstitialAdFailedToShow;
+		ConsoliAds.onInterstitialAdClosedEvent += onInterstitialAdClosed;
+		ConsoliAds.onInterstitialAdClickedEvent += onInterstitialAdClicked;
+
 		ConsoliAds.onRewardedVideoAdShownEvent += onRewardedVideoAdShown;
-		ConsoliAds.onPopupAdShownEvent += onPopupAdShown;
+		ConsoliAds.onRewardedVideoAdFailToShowEvent += onRewardedVideoAdFailToShow;
+		ConsoliAds.onRewardedVideoAdLoadedEvent += onRewardedVideoAdLoaded;
+		ConsoliAds.onRewardedVideoAdFailToLoadEvent += onRewardedVideoAdFailToLoad;
+		ConsoliAds.onRewardedVideoAdClosedEvent += onRewardedVideoAdClosed;
+		ConsoliAds.onRewardedVideoAdClickEvent += onRewardedVideoAdShown;
 		ConsoliAds.onRewardedVideoAdCompletedEvent += onRewardedVideoCompleted;
-		ConsoliAds.onConsoliAdsInitializationSuccess += onConsoliAdsInitialization;
+
+		ConsoliAds.onBannerAdShownEvent += onBannerAdShown;
+		ConsoliAds.onBannerAdRefreshEvent += onBannerAdRefresh;
+		ConsoliAds.onBannerAdFailToShowEvent += onBannerAdFailToShow;
+		ConsoliAds.onBannerAdClickEvent += onBannerAdClick;
+
+		ConsoliAds.didCloseIconAdEvent += didCloseIconAd;
+		ConsoliAds.didClickIconAdEvent += didClickIconAd;
+		ConsoliAds.didDisplayIconAdEvent+= didDisplayIconAd;
+		ConsoliAds.didRefreshIconAdEvent += didRefreshIconAd;
+		ConsoliAds.didLoadIconAdEvent += didLoadIconAd;
+		ConsoliAds.didFailedToLoadIconAdEvent += didFailedToLoadIconAd;
+
+		ConsoliAds.onNativeAdLoadedEvent += onNativeAdLoaded;
+		ConsoliAds.onNativeAdFailedToLoadEvent += onNativeAdFailedToLoad;
 	}
 
 	public void InitializeButtonPressed()
@@ -84,7 +114,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 		if (ConsoliAds.Instance == null) {
 			return;
 		}
-		if (isInitialized && isNeedToUpdate) {
+		if (ConsoliAds.Instance.IsInitialized && isNeedToUpdate) {
 
 			isNeedToUpdate = false;
 		
@@ -136,14 +166,20 @@ public class ConsoliAdsSample : MonoBehaviour {
 			case 2:
 				{
 					if (scene.bannerDetails.enabled) {
-							bld.Append("" + scene.bannerDetails.adType + "\n");
+						foreach (AdNetworkName adNetwork in scene.bannerDetails.networkList ) 
+						{
+							bld.Append("" + adNetwork + "\n");
+						}
 					}
 				}
 				break;
 			case 3:
 				{
 					if (scene.nativeDetails.enabled) {
-							bld.Append("" + scene.nativeDetails.adType + "\n");
+						foreach (AdNetworkName adNetwork in scene.nativeDetails.networkList ) 
+							{
+								bld.Append("" + adNetwork + "\n");
+							}
 					}
 				}
 				break;
@@ -153,6 +189,16 @@ public class ConsoliAdsSample : MonoBehaviour {
 							bld.Append("" + scene.iconDetails.adType + "\n");
 						}
 				}
+			break;
+		case 5:
+			{
+				if (scene.bannerDetails.enabled) {
+					foreach (AdNetworkName adNetwork in scene.bannerDetails.networkList ) 
+					{
+						bld.Append("" + adNetwork + "\n");
+					}
+				}
+			}
 				break;
 		}
 		adNetworkListText.text = bld.ToString();
@@ -176,20 +222,22 @@ public class ConsoliAdsSample : MonoBehaviour {
 		
 	public void adTypeDropDownValueChanged(int value) {
 
-		if (isInitialized){
+		if (ConsoliAds.Instance.IsInitialized)
+        {
 			updateAdNetworkText (SceneNameDropDown.value);
 		}
 	}
 
 	public void sceneNameDropDownValueChanged(int value) {
-		if(isInitialized){
+		if(ConsoliAds.Instance.IsInitialized)
+        {
 			updateAdNetworkText (SceneNameDropDown.value);
 		}
 	}
 
 	public void isAdAvailable()
 	{
-		if (isInitialized) {
+		if (ConsoliAds.Instance.IsInitialized) {
 
 			switch (AdTypeDropDown.value) 
 			{
@@ -214,7 +262,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 	public void showAd()
 	{
 		Debug.Log ("showAd called " + SceneNameDropDown.value);
-		if (isInitialized) {
+		if (ConsoliAds.Instance.IsInitialized) {
 
 			switch (AdTypeDropDown.value) 
 			{
@@ -230,7 +278,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 				break;
 				case 2:
 					{
-						ConsoliAds.Instance.ShowBanner(SceneNameDropDown.value);
+						ConsoliAds.Instance.ShowBanner(SceneNameDropDown.value , consoliAdsBannerView);
 					}
 				break;
 			case 3:
@@ -240,7 +288,12 @@ public class ConsoliAdsSample : MonoBehaviour {
 				break;
 			case 4:
 				{
-					ConsoliAds.Instance.ShowIconAd (iconAdGameObject , SceneNameDropDown.value);
+					ConsoliAds.Instance.ShowIconAd (iconAdGameObject , SceneNameDropDown.value , IconAnimationType.PULSE);
+				}
+				break;
+			case 5:
+				{
+					ConsoliAds.Instance.ShowBanner(SceneNameDropDown.value , consoliAdsBannerViewSecond);
 				}
 				break;
 			}
@@ -256,7 +309,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 
 		Debug.Log ("request Ad called " + SceneNameDropDown.value);
 
-		if (isInitialized) {
+		if (ConsoliAds.Instance.IsInitialized) {
 			
 			switch (AdTypeDropDown.value) {
 				case 0:
@@ -268,7 +321,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 				break;
 				case 2:
 				{
-						ConsoliAds.Instance.HideBanner();
+					ConsoliAds.Instance.HideBanner(consoliAdsBannerView);
 				}
 				break;
 				case 3:
@@ -279,6 +332,11 @@ public class ConsoliAdsSample : MonoBehaviour {
 				case 4:
 				{
 						ConsoliAds.Instance.DestoryIconAd(iconAdGameObject , SceneNameDropDown.value);
+				}
+				break;
+				case 5:
+				{
+					ConsoliAds.Instance.HideBanner(consoliAdsBannerViewSecond);
 				}
 				break;
 			}
@@ -300,7 +358,6 @@ public class ConsoliAdsSample : MonoBehaviour {
 
 	void onConsoliAdsInitialization()
 	{
-		isInitialized = true;
 		Debug.Log("Sample: onConsoliAdsInitialization called ");
 	}
 
@@ -308,20 +365,105 @@ public class ConsoliAdsSample : MonoBehaviour {
 	{
 		Debug.Log("Sample: onInterstitialAdShown called");
 	}
-	void onVideoAdShown()
+
+	void onInterstitialAdFailedToShow()
 	{
-		Debug.Log("Sample: onVideoAdShown called");
+		Debug.Log("Sample: onInterstitialAdFailedToShow called");
 	}
+
+	void onInterstitialAdClosed()
+	{
+		Debug.Log("Sample: onInterstitialAdClosed called");
+	}
+
+	void onInterstitialAdClicked()
+	{
+		Debug.Log("Sample: onInterstitialAdClicked called");
+	}
+
 	void onRewardedVideoAdShown()
 	{
 		Debug.Log("Sample: onRewardedVideoAdShown called");
 	}
-	void onPopupAdShown()
+
+	void onRewardedVideoAdFailToShow()
 	{
-		Debug.Log("Sample: onPopupAdShown called");
+		Debug.Log("Sample: onRewardedVideoAdFailToShow called");
 	}
-	public void onRewardedVideoCompleted()
+
+	void onRewardedVideoAdLoaded()
 	{
-		Debug.Log("Sample: Event received : Rewarded Video Complete");
+		Debug.Log("Sample: onRewardedVideoAdLoaded called");
 	}
+
+	void onRewardedVideoAdFailToLoad()
+	{
+		Debug.Log("Sample: onRewardedVideoAdFailToLoad called");
+	}
+
+	void onRewardedVideoAdClosed()
+	{
+		Debug.Log("Sample: onRewardedVideoAdClosed called");
+	}
+
+	void onRewardedVideoCompleted()
+	{
+		Debug.Log("Sample: onRewardedVideoCompleted called");
+	}
+
+	void onBannerAdShown()
+	{
+		Debug.Log("Sample: onBannerAdShown called");
+	}
+
+	void onBannerAdFailToShow()
+	{
+		Debug.Log("Sample: onBannerAdFailToShow called");
+	}
+
+	void onBannerAdClick()
+	{
+		Debug.Log("Sample: onBannerAdClick called");
+	}
+
+	void onBannerAdRefresh()
+	{
+		Debug.Log("Sample: onBannerAdRefresh called");
+	}
+
+	void didFailedToLoadIconAd()
+	{
+		Debug.Log("Sample: didFailedToLoadIconAd called");
+	}
+	void didLoadIconAd()
+	{
+		Debug.Log("Sample: didLoadIconAd called");
+	}
+	void didRefreshIconAd()
+	{
+		Debug.Log("Sample: didRefreshIconAd called");
+	}
+	void didDisplayIconAd()
+	{
+		Debug.Log("Sample: didDisplayIconAd called");
+	}
+	void didClickIconAd()
+	{
+		Debug.Log("Sample: didClickIconAd called");
+	}
+	void didCloseIconAd()
+	{
+		Debug.Log("Sample: didCloseIconAd called");
+	}
+
+	void onNativeAdLoaded()
+	{
+		Debug.Log("Sample: onNativeAdLoaded called : ");
+	}
+
+	void onNativeAdFailedToLoad()
+	{
+		Debug.Log("Sample: onNativeAdFailedToLoad called : ");
+	}
+
 }
