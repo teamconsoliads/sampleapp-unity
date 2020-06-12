@@ -93,15 +93,14 @@ public class ConsoliAdsSample : MonoBehaviour {
 		ConsoliAds.onBannerAdFailToShowEvent += onBannerAdFailToShow;
 		ConsoliAds.onBannerAdClickEvent += onBannerAdClick;
 
-		ConsoliAds.didCloseIconAdEvent += didCloseIconAd;
-		ConsoliAds.didClickIconAdEvent += didClickIconAd;
-		ConsoliAds.didDisplayIconAdEvent+= didDisplayIconAd;
-		ConsoliAds.didRefreshIconAdEvent += didRefreshIconAd;
-		ConsoliAds.didLoadIconAdEvent += didLoadIconAd;
-		ConsoliAds.didFailedToLoadIconAdEvent += didFailedToLoadIconAd;
+		ConsoliAds.onIconAdCloseEvent += didCloseIconAd;
+		ConsoliAds.onIconAdClickEvent += didClickIconAd;
+		ConsoliAds.onIconAdShownEvent+= didDisplayIconAd;
+		ConsoliAds.onIconAdRefreshEvent += didRefreshIconAd;
+		ConsoliAds.onIconAdFailedToShowEvent += didFailedToLoadIconAd;
 
-		ConsoliAds.onNativeAdLoadedEvent += onNativeAdLoaded;
-		ConsoliAds.onNativeAdFailedToLoadEvent += onNativeAdFailedToLoad;
+		ConsoliAds.onNativeAdShownEvent += onNativeAdLoaded;
+		ConsoliAds.onNativeAdFailedToShownEvent += onNativeAdFailedToLoad;
 	}
 
 	public void InitializeButtonPressed()
@@ -306,6 +305,8 @@ public class ConsoliAdsSample : MonoBehaviour {
 
 	public void RequestAd()
 	{
+
+		//ConsoliAds.Instance.getDataFromPlatform ("41");
 
 		Debug.Log ("request Ad called " + SceneNameDropDown.value);
 
