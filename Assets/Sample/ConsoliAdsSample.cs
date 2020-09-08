@@ -85,7 +85,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 		ConsoliAds.onRewardedVideoAdLoadedEvent += onRewardedVideoAdLoaded;
 		ConsoliAds.onRewardedVideoAdFailToLoadEvent += onRewardedVideoAdFailToLoad;
 		ConsoliAds.onRewardedVideoAdClosedEvent += onRewardedVideoAdClosed;
-		ConsoliAds.onRewardedVideoAdClickEvent += onRewardedVideoAdShown;
+		ConsoliAds.onRewardedVideoAdClickEvent += onRewardedVideoAdClick;
 		ConsoliAds.onRewardedVideoAdCompletedEvent += onRewardedVideoCompleted;
 
 		ConsoliAds.onBannerAdShownEvent += onBannerAdShown;
@@ -101,6 +101,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 
 		ConsoliAds.onNativeAdShownEvent += onNativeAdLoaded;
 		ConsoliAds.onNativeAdFailedToShownEvent += onNativeAdFailedToLoad;
+		ConsoliAds.onNativeAdClickEvent += onNativeAdClicked;
 	}
 
 	public void InitializeButtonPressed()
@@ -287,7 +288,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 				break;
 			case 4:
 				{
-					ConsoliAds.Instance.ShowIconAd (iconAdGameObject , SceneNameDropDown.value , IconAnimationType.PULSE);
+					ConsoliAds.Instance.ShowIconAd (iconAdGameObject , SceneNameDropDown.value , IconAnimationType.PULSE , true);
 				}
 				break;
 			case 5:
@@ -387,6 +388,11 @@ public class ConsoliAdsSample : MonoBehaviour {
 		Debug.Log("Sample: onRewardedVideoAdShown called");
 	}
 
+	void onRewardedVideoAdClick()
+	{
+		Debug.Log("Sample: onRewardedVideoAdClick called");
+	}
+
 	void onRewardedVideoAdFailToShow()
 	{
 		Debug.Log("Sample: onRewardedVideoAdFailToShow called");
@@ -467,4 +473,8 @@ public class ConsoliAdsSample : MonoBehaviour {
 		Debug.Log("Sample: onNativeAdFailedToLoad called : ");
 	}
 
+	void onNativeAdClicked()
+	{
+		Debug.Log("Sample: onNativeAdClicked called : ");
+	}
 }
