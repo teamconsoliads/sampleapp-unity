@@ -8,19 +8,43 @@ public class Splash : MonoBehaviour
 {
 	public Toggle UserConsentToggle;
 
+	public Toggle DevModeToggle;
+
 	[Header("UI Buttons")]
 	public Button initButton;
 
+	[Header("Input Fields:")]
+	public InputField sceneIndextxtField;
+
+	int sceneIndex;
+
 	void Start ()
 	{
+		sceneIndex = 0;
 	}
 
 	public void InitializeButtonPressed()
 	{
 		bool userConsent = UserConsentToggle.isOn;
-		ConsoliAds.Instance.initialize(userConsent);
+		bool devMode = DevModeToggle.isOn;
+		ConsoliAds.Instance.initialize("",devMode , userConsent , Platform.Google);
 		initButton.enabled = false;// (false);
 		UserConsentToggle.enabled = false;
+		DevModeToggle.enabled = false;
+	}
+
+	public void PendingButtonPressed()
+	{
+		if (sceneIndextxtField.text != "") {
+			try {
+				sceneIndex = int.Parse (sceneIndextxtField.text);
+			}
+			catch(Exception ex) {
+				Debug.Log ("Unable to parse sceneIndex");
+			}
+		}
+		InitializeButtonPressed ();
+		ConsoliAds.Instance.ShowBanner ( BannerAdsManager.Instance.pendingBannerView , PlaceholderName.Default);
 	}
 
 	void OnDisable()

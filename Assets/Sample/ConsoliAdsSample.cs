@@ -17,8 +17,6 @@ public class ConsoliAdsSample : MonoBehaviour {
 	public Button showAdButton;
 
 	[Header("Toggles:")]
-	public Toggle RoundRobinToggle;
-	public Toggle PriorityToggle;
 	public Toggle UserConsentToggle;
 
 	[Header("DropDown:")]
@@ -29,29 +27,99 @@ public class ConsoliAdsSample : MonoBehaviour {
 	public List<string> SceneNameList = new List<string>();
 	public GameObject iconAdGameObject;
 	public GameObject nativeAdGameObject;
-
-	AdSize size = new AdSize (300,250);
-	AdPosition position = new AdPosition (100 , 200);
-	ConsoliAdsBannerView consoliAdsBannerView;
-	ConsoliAdsBannerView consoliAdsBannerViewSecond;
-
 	public InputField deviceID;
 
-	public 
+	public void updateAdNetworkText(int sceneID){
+
+		return;
+
+		if (ConsoliAds.Instance == null) {
+			return;
+		}
+
+		if (sceneID >= ConsoliAds.Instance.scenesArray.Length) {
+			return;
+		}
+		CAScene scene = ConsoliAds.Instance.scenesArray [sceneID];
+		var bld = new StringBuilder();
+
+		string str = "AdNetworks: \n";
+
+		switch (AdTypeDropDown.value)
+		{
+		case 0:
+			{
+				foreach (AdNetworkName adNetwork in scene.interstitialAndVideoDetails.networkList ) 
+				{
+					bld.Append( "" + adNetwork + "\n");
+				}
+			}
+			break;
+		case 1:
+			{
+				foreach (AdNetworkName adNetwork in scene.rewardedVideoDetails.networkList ) 
+				{
+					bld.Append("" + adNetwork + "\n");
+				}
+			}
+			break;
+		case 2:
+			{
+				if (scene.bannerDetails.enabled) {
+					foreach (AdNetworkName adNetwork in scene.bannerDetails.networkList ) 
+					{
+						bld.Append("" + adNetwork + "\n");
+					}
+				}
+			}
+			break;
+		case 3:
+			{
+				if (scene.nativeDetails.enabled) {
+					foreach (AdNetworkName adNetwork in scene.nativeDetails.networkList ) 
+					{
+						bld.Append("" + adNetwork + "\n");
+					}
+				}
+			}
+			break;
+		case 4:
+			{
+				if (scene.iconDetails.enabled) {
+					bld.Append("" + scene.iconDetails.adType + "\n");
+				}
+			}
+			break;
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+			{
+				if (scene.bannerDetails.enabled) {
+					foreach (AdNetworkName adNetwork in scene.bannerDetails.networkList ) 
+					{
+						bld.Append("" + adNetwork + "\n");
+					}
+				}
+			}
+			break;
+		}
+		adNetworkListText.text = bld.ToString();
+	}
 
 	void Start () {
-
-		consoliAdsBannerView = new ConsoliAdsBannerView ();
-		consoliAdsBannerViewSecond = new ConsoliAdsBannerView ();
 
 		adNetworkListText.text = "";
 
 		AdTypeList.Add ("Interstitial/Video");
 		AdTypeList.Add ("Rewarded");
-		AdTypeList.Add ("Banner");
+		AdTypeList.Add ("SimpleBanner");
 		AdTypeList.Add ("Native");
 		AdTypeList.Add ("Icon");
-		AdTypeList.Add ("Second Banner");
+		AdTypeList.Add ("Custom Position Banner");
+		AdTypeList.Add ("Custom Size Banner");
+		AdTypeList.Add ("Full Custom Banner");
+		AdTypeList.Add ("Pending Banner");
 
 		AdTypeDropDown.options.Clear ();
 		SceneNameDropDown.options.Clear ();
@@ -64,6 +132,22 @@ public class ConsoliAdsSample : MonoBehaviour {
 		//this swith from 1 to 0 is only to refresh the visual DdMenu
 		AdTypeDropDown.value = 1;
 		AdTypeDropDown.value = 0;
+
+		SceneNameDropDown.options.Add (new Dropdown.OptionData () { text = Enum.GetName (typeof(PlaceholderName), (int)PlaceholderName.Default) });
+
+		//fill the dropdown menu OptionData with all COM's Name in ports[]
+		foreach(PlaceholderName c in Enum.GetValues(typeof(PlaceholderName)))
+		{
+			if (c != PlaceholderName.Default) {
+				SceneNameDropDown.options.Add (new Dropdown.OptionData () { text = Enum.GetName (typeof(PlaceholderName), (int)c) });
+			}
+		}
+			
+		//this swith from 1 to 0 is only to refresh the visual DdMenu
+		SceneNameDropDown.value = 1;
+		SceneNameDropDown.value = 0;
+
+		//updateAdNetworkText (0);
 	}
 
 	void Awake()
@@ -75,6 +159,9 @@ public class ConsoliAdsSample : MonoBehaviour {
 	{
 		ConsoliAds.onConsoliAdsInitializationSuccess += onConsoliAdsInitialization;
 		// Listen to all impression-related events
+
+		ConsoliAds.onInterstitialAdLoadedEvent += onInterstitialAdLoaded;
+		ConsoliAds.onInterstitialAdFailToLoadEvent += onInterstitialAdFailToLoad;
 		ConsoliAds.onInterstitialAdShownEvent += onInterstitialAdShown;
 		ConsoliAds.onInterstitialAdFailedToShowEvent += onInterstitialAdFailedToShow;
 		ConsoliAds.onInterstitialAdClosedEvent += onInterstitialAdClosed;
@@ -110,7 +197,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 	}
 
 	void Update () {
-
+		/*
 		if (ConsoliAds.Instance == null) {
 			return;
 		}
@@ -128,97 +215,10 @@ public class ConsoliAdsSample : MonoBehaviour {
 			SceneNameDropDown.value = 1;
 			SceneNameDropDown.value = 0;
 		}
+		*/
 
 	}
 
-	public void updateAdNetworkText(int sceneID){
-	
-		if (ConsoliAds.Instance == null) {
-			return;
-		}
-			
-		if (sceneID >= ConsoliAds.Instance.scenesArray.Length) {
-			return;
-		}
-		CAScene scene = ConsoliAds.Instance.scenesArray [sceneID];
-		var bld = new StringBuilder();
-
-		string str = "AdNetworks: \n";
-
-		switch (AdTypeDropDown.value)
-		{
-			case 0:
-				{
-					foreach (AdNetworkName adNetwork in scene.interstitialAndVideoDetails.networkList ) 
-					{
-							bld.Append( "" + adNetwork + "\n");
-					}
-				}
-				break;
-			case 1:
-				{
-					foreach (AdNetworkName adNetwork in scene.rewardedVideoDetails.networkList ) 
-					{
-							bld.Append("" + adNetwork + "\n");
-					}
-				}
-				break;
-			case 2:
-				{
-					if (scene.bannerDetails.enabled) {
-						foreach (AdNetworkName adNetwork in scene.bannerDetails.networkList ) 
-						{
-							bld.Append("" + adNetwork + "\n");
-						}
-					}
-				}
-				break;
-			case 3:
-				{
-					if (scene.nativeDetails.enabled) {
-						foreach (AdNetworkName adNetwork in scene.nativeDetails.networkList ) 
-							{
-								bld.Append("" + adNetwork + "\n");
-							}
-					}
-				}
-				break;
-			case 4:
-				{
-						if (scene.iconDetails.enabled) {
-							bld.Append("" + scene.iconDetails.adType + "\n");
-						}
-				}
-			break;
-		case 5:
-			{
-				if (scene.bannerDetails.enabled) {
-					foreach (AdNetworkName adNetwork in scene.bannerDetails.networkList ) 
-					{
-						bld.Append("" + adNetwork + "\n");
-					}
-				}
-			}
-				break;
-		}
-		adNetworkListText.text = bld.ToString();
-	}
-
-	public void roundRobinToggleValueChange() {
-
-		PriorityToggle.isOn = !RoundRobinToggle.isOn;
-		if(RoundRobinToggle.isOn){
-			ConsoliAds.Instance.setShowAdMechanism (ConsoliAdsShowAdMechanism.RoundRobin);
-		}
-	}
-
-	public void priorityToggleValueChange() {
-
-		RoundRobinToggle.isOn = !PriorityToggle.isOn;
-		if(PriorityToggle.isOn){
-			ConsoliAds.Instance.setShowAdMechanism (ConsoliAdsShowAdMechanism.RoundRobin);
-		}
-	}
 		
 	public void adTypeDropDownValueChanged(int value) {
 
@@ -231,7 +231,7 @@ public class ConsoliAdsSample : MonoBehaviour {
 	public void sceneNameDropDownValueChanged(int value) {
 		if(ConsoliAds.Instance.IsInitialized)
         {
-			updateAdNetworkText (SceneNameDropDown.value);
+			//updateAdNetworkText (SceneNameDropDown.value);
 		}
 	}
 
@@ -239,16 +239,27 @@ public class ConsoliAdsSample : MonoBehaviour {
 	{
 		if (ConsoliAds.Instance.IsInitialized) {
 
+			int sceneValue = SceneNameDropDown.value;
+			Debug.Log ("showAd called " + sceneValue);
+
+			if (sceneValue == 0) {
+				sceneValue = 27;
+			}
+
+			Debug.Log ("After Changed showAd called " + sceneValue);
+
+			PlaceholderName placeholderName = (PlaceholderName)sceneValue;
+
 			switch (AdTypeDropDown.value) 
 			{
 			case 0:
 				{
-					Debug.Log ("IsInterstitialAvailable " + ConsoliAds.Instance.IsInterstitialAvailable (SceneNameDropDown.value));
+					Debug.Log ("IsInterstitialAvailable " + ConsoliAds.Instance.IsInterstitialAvailable (placeholderName));
 				}
 				break;
 			case 1:
 				{
-					Debug.Log ("IsRewardedVideoAvailable " + ConsoliAds.Instance.IsRewardedVideoAvailable (SceneNameDropDown.value));
+					Debug.Log ("IsRewardedVideoAvailable " + ConsoliAds.Instance.IsRewardedVideoAvailable (placeholderName));
 				}
 				break;
 			}
@@ -261,39 +272,65 @@ public class ConsoliAdsSample : MonoBehaviour {
 
 	public void showAd()
 	{
-		Debug.Log ("showAd called " + SceneNameDropDown.value);
+		int sceneValue = SceneNameDropDown.value;
+		Debug.Log ("showAd called " + sceneValue);
+
+		if (sceneValue == 0) {
+			sceneValue = 27;
+		}
+
+		Debug.Log ("After Changed showAd called " + sceneValue);
+
+		PlaceholderName placeholderName = (PlaceholderName)sceneValue;
+
+
 		if (ConsoliAds.Instance.IsInitialized) {
 
 			switch (AdTypeDropDown.value) 
 			{
 				case 0:
 					{
-						ConsoliAds.Instance.ShowInterstitial(SceneNameDropDown.value);
+					ConsoliAds.Instance.ShowInterstitial(placeholderName);
 					}
 				break;
 				case 1:
 					{
-						ConsoliAds.Instance.ShowRewardedVideo(SceneNameDropDown.value);
+					ConsoliAds.Instance.ShowRewardedVideo(placeholderName);
 					}
 				break;
 				case 2:
 					{
-						ConsoliAds.Instance.ShowBanner(SceneNameDropDown.value , consoliAdsBannerView);
+					ConsoliAds.Instance.ShowBanner( BannerAdsManager.Instance.simpleBannerView , placeholderName );
 					}
 				break;
 			case 3:
 				{
-					ConsoliAds.Instance.ShowNativeAd (nativeAdGameObject , SceneNameDropDown.value);
+					ConsoliAds.Instance.ShowNativeAd (nativeAdGameObject , placeholderName);
 				}
 				break;
 			case 4:
 				{
-					ConsoliAds.Instance.ShowIconAd (iconAdGameObject , SceneNameDropDown.value , IconAnimationType.PULSE , true);
+					ConsoliAds.Instance.ShowIconAd (iconAdGameObject , IconAnimationType.PULSE , true , placeholderName);
 				}
 				break;
 			case 5:
 				{
-					ConsoliAds.Instance.ShowBanner(SceneNameDropDown.value , consoliAdsBannerViewSecond);
+					ConsoliAds.Instance.ShowBanner( BannerAdsManager.Instance.customPositionBannerView ,placeholderName);
+				}
+				break;
+			case 6:
+				{
+					ConsoliAds.Instance.ShowBanner(BannerAdsManager.Instance.customSizeBannerView , placeholderName );
+				}
+				break;
+			case 7:
+				{
+					ConsoliAds.Instance.ShowBanner(BannerAdsManager.Instance.fullCustomBannerView , placeholderName);
+				}
+				break;
+			case 8:
+				{
+					ConsoliAds.Instance.ShowBanner(BannerAdsManager.Instance.pendingBannerView , placeholderName);
 				}
 				break;
 			}
@@ -307,38 +344,63 @@ public class ConsoliAdsSample : MonoBehaviour {
 	public void RequestAd()
 	{
 
-		//ConsoliAds.Instance.getDataFromPlatform ("41");
+		int sceneValue = SceneNameDropDown.value;
+		Debug.Log ("RequestAd called " + sceneValue);
 
-		Debug.Log ("request Ad called " + SceneNameDropDown.value);
+		if (sceneValue == 0) {
+			sceneValue = 27;
+		}
+
+		Debug.Log ("After Changed RequestAd called " + sceneValue);
+
+		PlaceholderName placeholderName = (PlaceholderName)sceneValue;
 
 		if (ConsoliAds.Instance.IsInitialized) {
 			
 			switch (AdTypeDropDown.value) {
 				case 0:
+				{
+					ConsoliAds.Instance.LoadInterstitial();
+				}
 				break;
 				case 1:
 					{
-						ConsoliAds.Instance.LoadRewarded(SceneNameDropDown.value);
+						ConsoliAds.Instance.LoadRewarded();
 					}
 				break;
 				case 2:
 				{
-					ConsoliAds.Instance.HideBanner(consoliAdsBannerView);
+					ConsoliAds.Instance.HideBanner(BannerAdsManager.Instance.simpleBannerView);
 				}
 				break;
 				case 3:
 				{
-						ConsoliAds.Instance.HideNative(SceneNameDropDown.value);
+						ConsoliAds.Instance.HideNative();
 				}
 				break;
 				case 4:
 				{
-						ConsoliAds.Instance.DestoryIconAd(iconAdGameObject , SceneNameDropDown.value);
+						ConsoliAds.Instance.DestoryIconAd(iconAdGameObject);
 				}
 				break;
 				case 5:
 				{
-					ConsoliAds.Instance.HideBanner(consoliAdsBannerViewSecond);
+					ConsoliAds.Instance.HideBanner(BannerAdsManager.Instance.customPositionBannerView);
+				}
+				break;
+			case 6:
+				{
+					ConsoliAds.Instance.HideBanner(BannerAdsManager.Instance.customSizeBannerView);
+				}
+				break;
+			case 7:
+				{
+					ConsoliAds.Instance.HideBanner(BannerAdsManager.Instance.fullCustomBannerView);
+				}
+				break;
+			case 8:
+				{
+					ConsoliAds.Instance.HideBanner(BannerAdsManager.Instance.pendingBannerView);
 				}
 				break;
 			}
@@ -352,25 +414,34 @@ public class ConsoliAdsSample : MonoBehaviour {
 			deviceId = deviceID.text.ToString();
 		}
 		catch (Exception ex) {
+			Debug.Log (ex.ToString ());
 		}
 		ConsoliAds.Instance.addAdmobTestDevice (deviceId);
 	}
-
-	/* ------------------------ */
 
 	void onConsoliAdsInitialization()
 	{
 		Debug.Log("Sample: onConsoliAdsInitialization called ");
 	}
 
-	void onInterstitialAdShown()
+	void onInterstitialAdLoaded()
 	{
-		Debug.Log("Sample: onInterstitialAdShown called");
+		Debug.Log("Sample: onInterstitialAdLoaded called for scene : ");
 	}
 
-	void onInterstitialAdFailedToShow()
+	void onInterstitialAdFailToLoad()
 	{
-		Debug.Log("Sample: onInterstitialAdFailedToShow called");
+		Debug.Log("Sample: onInterstitialAdFailToLoad called for scene : ");
+	}
+
+	void onInterstitialAdShown(PlaceholderName placeholderName)
+	{
+		Debug.Log("Sample: onInterstitialAdShown called for scene : " + placeholderName);
+	}
+
+	void onInterstitialAdFailedToShow(PlaceholderName placeholderName)
+	{
+		Debug.Log("Sample: onInterstitialAdFailedToShow called for scene : " + placeholderName);
 	}
 
 	void onInterstitialAdClosed()
@@ -477,4 +548,5 @@ public class ConsoliAdsSample : MonoBehaviour {
 	{
 		Debug.Log("Sample: onNativeAdClicked called : ");
 	}
+
 }
