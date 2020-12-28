@@ -8,8 +8,6 @@ public class Splash : MonoBehaviour
 {
 	public Toggle UserConsentToggle;
 
-	public Toggle DevModeToggle;
-
 	[Header("UI Buttons")]
 	public Button initButton;
 
@@ -26,11 +24,9 @@ public class Splash : MonoBehaviour
 	public void InitializeButtonPressed()
 	{
 		bool userConsent = UserConsentToggle.isOn;
-		bool devMode = DevModeToggle.isOn;
-		ConsoliAds.Instance.initialize("",devMode , userConsent , Platform.Google);
+		ConsoliAds.Instance.initialize(userConsent);
 		initButton.enabled = false;// (false);
 		UserConsentToggle.enabled = false;
-		DevModeToggle.enabled = false;
 	}
 
 	public void PendingButtonPressed()
