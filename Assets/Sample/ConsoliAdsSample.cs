@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.Text;
 using System;
+using SimpleJSON;
 
 public class ConsoliAdsSample : MonoBehaviour {
     
@@ -189,6 +190,10 @@ public class ConsoliAdsSample : MonoBehaviour {
 		ConsoliAds.onNativeAdShownEvent += onNativeAdLoaded;
 		ConsoliAds.onNativeAdFailedToShownEvent += onNativeAdFailedToLoad;
 		ConsoliAds.onNativeAdClickEvent += onNativeAdClicked;
+
+		ConsoliAds.onInAppPurchaseRestoredEvent += onInAppPurchaseRestored;
+		ConsoliAds.onInAppSuccessEvent += onInAppSuccess;
+		ConsoliAds.onInAppFailureEvent += onInAppFailure;
 	}
 
 	public void InitializeButtonPressed()
@@ -360,12 +365,12 @@ public class ConsoliAdsSample : MonoBehaviour {
 			switch (AdTypeDropDown.value) {
 				case 0:
 				{
-					ConsoliAds.Instance.LoadInterstitial();
+					ConsoliAds.Instance.LoadInterstitial(placeholderName);
 				}
 				break;
 				case 1:
 					{
-						ConsoliAds.Instance.LoadRewarded();
+					ConsoliAds.Instance.LoadRewarded(placeholderName);
 					}
 				break;
 				case 2:
@@ -424,14 +429,14 @@ public class ConsoliAdsSample : MonoBehaviour {
 		Debug.Log("Sample: onConsoliAdsInitialization called ");
 	}
 
-	void onInterstitialAdLoaded()
+	void onInterstitialAdLoaded(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onInterstitialAdLoaded called for scene : ");
+		Debug.Log("Sample: onInterstitialAdLoaded called for scene : " + placeholderName);
 	}
 
-	void onInterstitialAdFailToLoad()
+	void onInterstitialAdFailToLoad(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onInterstitialAdFailToLoad called for scene : ");
+		Debug.Log("Sample: onInterstitialAdFailToLoad called for scene : " + placeholderName);
 	}
 
 	void onInterstitialAdShown(PlaceholderName placeholderName)
@@ -444,9 +449,9 @@ public class ConsoliAdsSample : MonoBehaviour {
 		Debug.Log("Sample: onInterstitialAdFailedToShow called for scene : " + placeholderName);
 	}
 
-	void onInterstitialAdClosed()
+	void onInterstitialAdClosed(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onInterstitialAdClosed called");
+		Debug.Log("Sample: onInterstitialAdClosed called : " + placeholderName);
 	}
 
 	void onInterstitialAdClicked()
@@ -454,9 +459,9 @@ public class ConsoliAdsSample : MonoBehaviour {
 		Debug.Log("Sample: onInterstitialAdClicked called");
 	}
 
-	void onRewardedVideoAdShown()
+	void onRewardedVideoAdShown(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onRewardedVideoAdShown called");
+		Debug.Log("Sample: onRewardedVideoAdShown called " + placeholderName);
 	}
 
 	void onRewardedVideoAdClick()
@@ -464,29 +469,29 @@ public class ConsoliAdsSample : MonoBehaviour {
 		Debug.Log("Sample: onRewardedVideoAdClick called");
 	}
 
-	void onRewardedVideoAdFailToShow()
+	void onRewardedVideoAdFailToShow(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onRewardedVideoAdFailToShow called");
+		Debug.Log("Sample: onRewardedVideoAdFailToShow called " + placeholderName);
 	}
 
-	void onRewardedVideoAdLoaded()
+	void onRewardedVideoAdLoaded(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onRewardedVideoAdLoaded called");
+		Debug.Log("Sample: onRewardedVideoAdLoaded called " + placeholderName);
 	}
 
-	void onRewardedVideoAdFailToLoad()
+	void onRewardedVideoAdFailToLoad(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onRewardedVideoAdFailToLoad called");
+		Debug.Log("Sample: onRewardedVideoAdFailToLoad called " + placeholderName);
 	}
 
-	void onRewardedVideoAdClosed()
+	void onRewardedVideoAdClosed(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onRewardedVideoAdClosed called");
+		Debug.Log("Sample: onRewardedVideoAdClosed called : " + placeholderName);
 	}
 
-	void onRewardedVideoCompleted()
+	void onRewardedVideoCompleted(PlaceholderName placeholderName)
 	{
-		Debug.Log("Sample: onRewardedVideoCompleted called");
+		Debug.Log("Sample: onRewardedVideoCompleted called " + placeholderName);
 	}
 
 	void onBannerAdShown()
@@ -547,6 +552,21 @@ public class ConsoliAdsSample : MonoBehaviour {
 	void onNativeAdClicked()
 	{
 		Debug.Log("Sample: onNativeAdClicked called : ");
+	}
+
+	void onInAppPurchaseRestored (CAInAppDetails caInAppDetails)
+	{
+		Debug.Log("Sample: onInAppPurchaseRestored called for : " + caInAppDetails.ToString());
+	}
+
+	void onInAppSuccess(CAInAppDetails caInAppDetails)
+	{
+		Debug.Log("Sample: onInAppSuccess called for : " + caInAppDetails.ToString());
+	}
+
+	void onInAppFailure(CAInAppError caInAppError)
+	{
+		Debug.Log("Sample: onInAppFailure called for : " + caInAppError.ToString());
 	}
 
 }
